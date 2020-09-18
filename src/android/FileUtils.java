@@ -30,8 +30,6 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 
-import androidx.core.content.FileProvider;
-
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -45,8 +43,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.util.Comparator;
-
-import okhttp3.ResponseBody;
 
 public class FileUtils {
     public static final String DOCUMENTS_DIR = "documents";
@@ -266,7 +262,7 @@ public class FileUtils {
                 return cursor.getString(column_index);
             }
         }  catch (Exception e) {
-           // Timber.e(e);
+            // Timber.e(e);
         } finally {
             if (cursor != null)
                 cursor.close();
@@ -475,62 +471,6 @@ public class FileUtils {
         return intent;
     }
 
-
-    /**
-     * Creates View intent for given file
-     *
-     * @param file
-     * @return The intent for viewing file
-     */
-    public static Intent getViewIntent(Context context, File file) {
-        //Uri uri = Uri.fromFile(file);
-        Uri uri = FileProvider.getUriForFile(context, AUTHORITY, file);
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        String url = file.toString();
-        if (url.contains(".doc") || url.contains(".docx")) {
-            // Word document
-            intent.setDataAndType(uri, "application/msword");
-        } else if (url.contains(".pdf")) {
-            // PDF file
-            intent.setDataAndType(uri, "application/pdf");
-        } else if (url.contains(".ppt") || url.contains(".pptx")) {
-            // Powerpoint file
-            intent.setDataAndType(uri, "application/vnd.ms-powerpoint");
-        } else if (url.contains(".xls") || url.contains(".xlsx")) {
-            // Excel file
-            intent.setDataAndType(uri, "application/vnd.ms-excel");
-        } else if (url.contains(".zip") || url.contains(".rar")) {
-            // WAV audio file
-            intent.setDataAndType(uri, "application/x-wav");
-        } else if (url.contains(".rtf")) {
-            // RTF file
-            intent.setDataAndType(uri, "application/rtf");
-        } else if (url.contains(".wav") || url.contains(".mp3")) {
-            // WAV audio file
-            intent.setDataAndType(uri, "audio/x-wav");
-        } else if (url.contains(".gif")) {
-            // GIF file
-            intent.setDataAndType(uri, "image/gif");
-        } else if (url.contains(".jpg") || url.contains(".jpeg") || url.contains(".png")) {
-            // JPG file
-            intent.setDataAndType(uri, "image/jpeg");
-        } else if (url.contains(".txt")) {
-            // Text file
-            intent.setDataAndType(uri, "text/plain");
-        } else if (url.contains(".3gp") || url.contains(".mpg") || url.contains(".mpeg") ||
-                url.contains(".mpe") || url.contains(".mp4") || url.contains(".avi")) {
-            // Video files
-            intent.setDataAndType(uri, "video/*");
-        } else {
-            intent.setDataAndType(uri, "*/*");
-        }
-
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        return intent;
-    }
-
     public static File getDownloadsDir() {
         return Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
     }
@@ -592,55 +532,6 @@ public class FileUtils {
         logDir(directory);
 
         return file;
-    }
-
-    /**
-     * Writes response body to disk
-     *
-     * @param body ResponseBody
-     * @param path file path
-     * @return File
-     */
-    public static File writeResponseBodyToDisk(ResponseBody body, String path) {
-        try {
-            File target = new File(path);
-
-            InputStream inputStream = null;
-            OutputStream outputStream = null;
-
-            try {
-                byte[] fileReader = new byte[4096];
-
-                inputStream = body.byteStream();
-                outputStream = new FileOutputStream(target);
-
-                while (true) {
-                    int read = inputStream.read(fileReader);
-
-                    if (read == -1) {
-                        break;
-                    }
-
-                    outputStream.write(fileReader, 0, read);
-                }
-
-                outputStream.flush();
-
-                return target;
-            } catch (IOException e) {
-                return null;
-            } finally {
-                if (inputStream != null) {
-                    inputStream.close();
-                }
-
-                if (outputStream != null) {
-                    outputStream.close();
-                }
-            }
-        } catch (IOException e) {
-            return null;
-        }
     }
 
     private static void saveFileFromUri(Context context, Uri uri, String destinationPath) {
