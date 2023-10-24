@@ -117,7 +117,7 @@ public class VideoEditor extends CordovaPlugin {
         Log.d(TAG, "transcodeVideo firing");
 
         JSONObject options = args.optJSONObject(0);
-        Log.d(TAG, "options: " + options.toString());
+        Log.d(TAG, "options 3: " + options.toString());
 
         final ReadDataResult readResult = this.readDataFrom(options.getString("fileUri"));
         if (readResult == null) {

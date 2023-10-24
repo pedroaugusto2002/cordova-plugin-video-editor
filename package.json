@@ -12,16 +12,7 @@
       "ios"
     ]
   },
-  "keywords": [
-    "cordova",
-    "video",
-    "editing",
-    "editor",
-    "cordova",
-    "ecosystem:cordova",
-    "cordova-android",
-    "cordova-ios"
-  ],
+  "keywords": [],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jbavari/cordova-plugin-video-editor.git"
@@ -38,7 +29,6 @@
       "email": "rmartin311@gmail.com"
     }
   ],
-  "keywords": [],
   "author": "Josh Bavari",
   "license": "MIT",
   "bugs": {
