@@ -29,6 +29,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 
+import android.Manifest;
+import androidx.core.app.ActivityCompat;
+
 import net.ypresto.androidtranscoder.MediaTranscoder;
 import net.ypresto.androidtranscoder.utils.MediaExtractorUtils;
 
@@ -115,6 +118,12 @@ public class VideoEditor extends CordovaPlugin {
      */
     private void transcodeVideo(JSONArray args) throws JSONException, IOException {
         Log.d(TAG, "transcodeVideo firing");
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // Se não foi concedida, solicita a permissão em tempo de execução
+            Log.d(TAG, "requesting permission");
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
+        }
 
         JSONObject options = args.optJSONObject(0);
         Log.d(TAG, "options 3: " + options.toString());
