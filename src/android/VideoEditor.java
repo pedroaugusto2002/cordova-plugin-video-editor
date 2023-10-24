@@ -42,6 +42,10 @@ import net.ypresto.androidtranscoder.utils.MediaExtractorUtils;
 public class VideoEditor extends CordovaPlugin {
 
     private static final String TAG = "VideoEditor";
+    private static final int REQUEST_READ_EXTERNAL_STORAGE = 1;
+    private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+
+
 
     private CallbackContext callback;
     private CordovaResourceApi resourceApi;
@@ -118,12 +122,11 @@ public class VideoEditor extends CordovaPlugin {
      */
     private void transcodeVideo(JSONArray args) throws JSONException, IOException {
         Log.d(TAG, "transcodeVideo firing");
+        Log.d(TAG, "args: " + args.toString());
+        ActivityCompat.requestPermissions(cordova.getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            // Se não foi concedida, solicita a permissão em tempo de execução
-            Log.d(TAG, "requesting permission");
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
-        }
+        ActivityCompat.requestPermissions(cordova.getActivity(), new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_READ_EXTERNAL_STORAGE);
+
 
         JSONObject options = args.optJSONObject(0);
         Log.d(TAG, "options 3: " + options.toString());
@@ -137,6 +140,8 @@ public class VideoEditor extends CordovaPlugin {
                 "outputFileName",
                 new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date())
         );
+
+        Log.d(TAG, "outputFileName: " + outputFileName);
 
         final int width = options.optInt("width", CustomAndroidFormatStrategy.DEFAULT_WIDTH);
         final int height = options.optInt("height", CustomAndroidFormatStrategy.DEFAULT_HEIGHT);
@@ -163,11 +168,10 @@ public class VideoEditor extends CordovaPlugin {
         File mediaStorageDir;
 
         if (saveToLibrary) {
-            mediaStorageDir = new File(
-                    Environment.getExternalStorageDirectory() + "/Movies",
-                    appName
-            );
+            Log.d(TAG, "ENTREI NO LIBRATY");
+            mediaStorageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + cordova.getActivity().getPackageName() + "/files/files/videos");
         } else {
+            Log.d(TAG, "NÃO ENTREI NO LIBRATY");
             mediaStorageDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Android/data/" + cordova.getActivity().getPackageName() + "/files/files/videos");
         }
 
@@ -179,15 +183,15 @@ public class VideoEditor extends CordovaPlugin {
             }
         }
 
-        final String outputFilePath = new File(
+        final File outputFile = new File(
                 mediaStorageDir.getPath(),
                 outputFileName + outputExtension
-        ).getAbsolutePath();
-
+        );
+        final String outputFilePath = outputFile.getAbsolutePath();
         Log.d(TAG, "outputFilePath: " + outputFilePath);
 
         cordova.getThreadPool().execute(() -> {
-
+            Log.d(TAG, "entrmei no getThreadPool");
             try {
                 MediaTranscoder.Listener listener = new MediaTranscoder.Listener() {
                     @Override
